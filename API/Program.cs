@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using Application.Activities;
+using Application.Core;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -16,6 +20,22 @@ opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 });
 
+builder.Services.AddCors(opt =>{
+
+opt.AddPolicy("CorsPolicy",policy =>{
+
+policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+
+});
+
+
+});
+
+
+// regulate all our MediatR dependencies
+builder.Services.AddMediatR(typeof(List.Handler));
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -24,6 +44,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// see if Cors policy is available.
+app.UseCors("Corspolicy");
 
 //app.UseHttpsRedirection();
 
